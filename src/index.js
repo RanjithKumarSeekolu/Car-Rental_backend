@@ -15,9 +15,9 @@ const db = admin.firestore();
 app.use(express.json());
 
 const corsOptions = {
-  origin: "http://localhost:1234", // Allow requests from this origin
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allow these HTTP methods
-  allowedHeaders: "Content-Type", // Allow this header
+  origin: ["http://localhost:1234", "https://car-rental-3a89c.web.app/"],
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Content-Type",
 };
 app.use(cors(corsOptions));
 
