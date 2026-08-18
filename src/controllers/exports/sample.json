@@ -1,0 +1,22 @@
+[
+  {
+    "id": "Xf92KdPqLmA1R7s8ZQwE",
+    "brand": "BMW",
+    "model": "X5",
+    "year": 2023,
+    "fuelType": "Diesel",
+    "price": 8500000,
+    "available": true,
+    "location": "Bangalore"
+  },
+  {
+    "id": "B9aQ2LmP0ZxK7YwR4dE1",
+    "brand": "Audi",
+    "model": "Q7",
+    "year": 2022,
+    "fuelType": "Petrol",
+    "price": 7800000,
+    "available": false,
+    "location": "Hyderabad"
+  }
+]

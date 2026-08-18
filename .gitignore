@@ -1,1 +1,13 @@
-/node_modules
+node_modules/
+.env
+.env.*
+!.env.example
+firebase-admin-sdk.json
+**/firebase-admin-sdk.json
+*.log
+.DS_Store
+coverage/
+cars.json
+*.pem
+serviceAccount*.json
+firebase-admin-sdk.json

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "hyderabad",
+    "name": "Hyderabad",
+    "state": "Telangana",
+    "country": "IN",
+    "center": { "lat": 17.385, "lng": 78.4867 },
+    "bounds": { "north": 17.55, "south": 17.2, "east": 78.65, "west": 78.25 },
+    "type": "city",
+    "isActive": true,
+    "sortOrder": 1
+  },
+  {
+    "id": "bangalore",
+    "name": "Bangalore",
+    "state": "Karnataka",
+    "country": "IN",
+    "center": { "lat": 12.9716, "lng": 77.5946 },
+    "bounds": { "north": 13.15, "south": 12.75, "east": 77.85, "west": 77.35 },
+    "type": "city",
+    "isActive": true,
+    "sortOrder": 2
+  },
+  {
+    "id": "chennai",
+    "name": "Chennai",
+    "state": "Tamil Nadu",
+    "country": "IN",
+    "center": { "lat": 13.0827, "lng": 80.2707 },
+    "bounds": { "north": 13.25, "south": 12.9, "east": 80.35, "west": 80.1 },
+    "type": "city",
+    "isActive": true,
+    "sortOrder": 3
+  },
+  {
+    "id": "mumbai",
+    "name": "Mumbai",
+    "state": "Maharashtra",
+    "country": "IN",
+    "center": { "lat": 19.076, "lng": 72.8777 },
+    "bounds": { "north": 19.3, "south": 18.9, "east": 73.05, "west": 72.75 },
+    "type": "city",
+    "isActive": true,
+    "sortOrder": 4
+  },
+  {
+    "id": "delhi",
+    "name": "Delhi",
+    "state": "Delhi",
+    "country": "IN",
+    "center": { "lat": 28.6139, "lng": 77.209 },
+    "bounds": { "north": 28.9, "south": 28.4, "east": 77.35, "west": 76.85 },
+    "type": "city",
+    "isActive": true,
+    "sortOrder": 5
+  },
+  {
+    "id": "pune",
+    "name": "Pune",
+    "state": "Maharashtra",
+    "country": "IN",
+    "center": { "lat": 18.5204, "lng": 73.8567 },
+    "bounds": { "north": 18.7, "south": 18.4, "east": 74.05, "west": 73.7 },
+    "type": "city",
+    "isActive": true,
+    "sortOrder": 6
+  }
+]

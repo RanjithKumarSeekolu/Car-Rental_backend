@@ -5,7 +5,7 @@ const cors = require("cors");
 
 //firebase
 const admin = require("firebase-admin");
-const serviceAccount = require("../firebase-admin-sdk.json");
+const serviceAccount = require("./firebase-admin-sdk.json");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -15,7 +15,7 @@ const db = admin.firestore();
 app.use(express.json());
 
 const corsOptions = {
-  origin: ["http://localhost:1234", "https://car-rental-3a89c.web.app"],
+  origin: ["http://localhost:1234", "https://car-rental-3a89c.web.app", "http://localhost:5173"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: "Content-Type",
 };
@@ -25,8 +25,9 @@ app.get("/", (req, res) => {
   res.send("Car Rantal");
 });
 
-app.get("/cars/getAllCars", async (req, res) => {
+app.get("/api/cars/", async (req, res) => {
   try {
+    console.log("get all cars")
     const collection = await db.collection("cars");
     const snapshot = await collection.get();
     const cars = [];
