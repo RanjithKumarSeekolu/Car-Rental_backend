@@ -1,8 +1,9 @@
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const { logger } = require('../utils/logger');
 const { db, admin } = require('../config/firebaseAdmin');
 
-const FROM = process.env.SMTP_FROM || process.env.SMTP_USER || 'RentNHost <noreply@rentnhost.com>';
+const FROM = process.env.EMAIL_FROM || process.env.SMTP_FROM || 'RentNHost <onboarding@resend.dev>';
 const APP_URL = process.env.APP_URL || 'http://localhost:5173';
 
 function esc(value) {
@@ -13,17 +14,20 @@ function esc(value) {
     .replace(/"/g, '&quot;');
 }
 
+function resendReady() {
+  return Boolean(process.env.RESEND_API_KEY?.trim());
+}
+
 function smtpReady() {
   return Boolean(process.env.SMTP_USER?.trim() && process.env.SMTP_PASSWORD?.trim());
 }
 
-function transporter() {
+function smtpTransporter() {
   const port = Number(process.env.SMTP_PORT) || 465;
-  const secure = port === 465;
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port,
-    secure,
+    secure: port === 465,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASSWORD,
@@ -38,34 +42,44 @@ async function sendMail({ to, subject, html, type = 'generic', meta = {} }) {
   if (!to) return { ok: false, error: 'no recipient' };
 
   const ref = await db.collection('mail').add({
-    to,
-    subject,
-    html,
-    type,
-    meta,
+    to, subject, html, type, meta,
     status: 'queued',
     createdAt: admin.firestore.FieldValue.serverTimestamp(),
   });
 
-  if (!smtpReady()) {
-    await ref.update({ status: 'stored', reason: 'no_smtp' });
-    logger.info(`Mail stored (no SMTP): ${type} -> ${to}`);
-    return { ok: true, stored: true, id: ref.id };
+  // 1. Try Resend API (works on all cloud hosts, no SMTP ports needed)
+  if (resendReady()) {
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      await resend.emails.send({ from: FROM, to, subject, html });
+      await ref.update({ status: 'sent', sentAt: admin.firestore.FieldValue.serverTimestamp() });
+      logger.info(`Mail sent via Resend: ${type} -> ${to}`);
+      return { ok: true, sent: true, id: ref.id };
+    } catch (error) {
+      await ref.update({ status: 'failed', error: error.message });
+      logger.error(`Resend failed: ${error.message}`);
+      return { ok: true, stored: true, sent: false, id: ref.id, error: error.message };
+    }
   }
 
-  try {
-    await transporter().sendMail({ from: FROM, to, subject, html });
-    await ref.update({
-      status: 'sent',
-      sentAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-    logger.info(`Mail sent: ${type} -> ${to}`);
-    return { ok: true, sent: true, id: ref.id };
-  } catch (error) {
-    await ref.update({ status: 'failed', error: error.message });
-    logger.error(`Mail SMTP failed, kept in inbox: ${error.message}`);
-    return { ok: true, stored: true, sent: false, id: ref.id, error: error.message };
+  // 2. Fall back to SMTP (local dev)
+  if (smtpReady()) {
+    try {
+      await smtpTransporter().sendMail({ from: FROM, to, subject, html });
+      await ref.update({ status: 'sent', sentAt: admin.firestore.FieldValue.serverTimestamp() });
+      logger.info(`Mail sent via SMTP: ${type} -> ${to}`);
+      return { ok: true, sent: true, id: ref.id };
+    } catch (error) {
+      await ref.update({ status: 'failed', error: error.message });
+      logger.error(`SMTP failed, kept in inbox: ${error.message}`);
+      return { ok: true, stored: true, sent: false, id: ref.id, error: error.message };
+    }
   }
+
+  // 3. No sender configured — store only
+  await ref.update({ status: 'stored', reason: 'no_sender' });
+  logger.info(`Mail stored (no sender configured): ${type} -> ${to}`);
+  return { ok: true, stored: true, id: ref.id };
 }
 
 const wrap = (title, body) => `
